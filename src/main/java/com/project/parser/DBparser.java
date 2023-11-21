@@ -34,53 +34,57 @@ public class DBparser {
 			// 소스파일이 엑셀인 경우
 			if(fileSource.endsWith(".xls") || fileSource.endsWith(".xlsx")){
 				FileInputStream fis = new FileInputStream(fileSource);
+				Workbook workbook = null;
 				
+				// 엑셀 확장자에 따른 처리
 				if(fileSource.endsWith(".xls")) {
 					// xls
-					Workbook workbook = new HSSFWorkbook(fis);
-					Sheet sheet = workbook.getSheetAt(1);
-					StringBuilder result = new StringBuilder();
-					FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
-					
-					Iterator<Row> rowIterator = sheet.iterator();
-
-		            // 첫 번째 행은 헤더로 처리하고 건너뜀
-		            if (rowIterator.hasNext()) {
-		                rowIterator.next();
-		            }
-		            
-		            while (rowIterator.hasNext()) {
-		                Row row = rowIterator.next();
-		                Iterator<Cell> cellIterator = row.cellIterator();
-		                
-		                while(cellIterator.hasNext()) {
-		                	// 셀 객체 특정 및 타입 파악
-		                	Cell cell = cellIterator.next();
-		                	CellType type = cell.getCellType();
-		                	//System.out.println(type);
-		                	
-		                	// 셀 타입에 따른 처리
-		                	if(type.toString().equals("FORMULA")) {
-		                		// 셀 타입이 수식인 경우
-		                		result.append(evaluator.evaluate(cell).getNumberValue() + " ");
-		                	}else if(type.toString().equals("NUMERIC")) {
-		                		// 셀 타입이 숫자인 경우
-		                		result.append(cell.getNumericCellValue() + " ");
-		                	}else {
-		                		// 셀 타입이 문자열인 경우
-		                		result.append(cell.getStringCellValue() + " ");
-		                	}
-		                }
-		                
-		                result.append("\n");
-		            }
-					
-		            System.out.println(result);
-					workbook.close();
+					workbook = new HSSFWorkbook(fis);
 				}else {
 					// xlsx
+					workbook = new XSSFWorkbook(fis);
 				}
 				
+				Sheet sheet = workbook.getSheetAt(1);
+				StringBuilder result = new StringBuilder();
+				FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+				
+				Iterator<Row> rowIterator = sheet.iterator();
+
+	            // 첫 번째 행은 헤더로 처리하고 건너뜀
+	            if (rowIterator.hasNext()) {
+	                rowIterator.next();
+	            }
+	            
+	            while (rowIterator.hasNext()) {
+	                Row row = rowIterator.next();
+	                Iterator<Cell> cellIterator = row.cellIterator();
+	                
+	                while(cellIterator.hasNext()) {
+	                	// 셀 객체 특정 및 타입 파악
+	                	Cell cell = cellIterator.next();
+	                	CellType type = cell.getCellType();
+	                	//System.out.println(type);
+	                	
+	                	// 셀 타입에 따른 처리
+	                	if(type.toString().equals("FORMULA")) {
+	                		// 셀 타입이 수식인 경우
+	                		result.append(evaluator.evaluate(cell).getNumberValue() + " ");
+	                	}else if(type.toString().equals("NUMERIC")) {
+	                		// 셀 타입이 숫자인 경우
+	                		result.append(cell.getNumericCellValue() + " ");
+	                	}else {
+	                		// 셀 타입이 문자열인 경우
+	                		result.append(cell.getStringCellValue() + " ");
+	                	}
+	                }
+	                
+	                result.append("\n");
+	            }
+				
+	            // 결과 출력
+	            System.out.println(result);
+				workbook.close();
 			}
 			
 		}catch (IOException e) {
