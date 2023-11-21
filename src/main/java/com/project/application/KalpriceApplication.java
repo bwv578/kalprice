@@ -2,14 +2,21 @@ package com.project.application;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 
 import com.project.parser.DBparser;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.project.parser"})
-public class KalpriceApplication {
+@ComponentScan(basePackages = {"com.project.application", "com.project.parser"})
+public class KalpriceApplication extends SpringBootServletInitializer{
 
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+		return builder.sources(KalpriceApplication.class);
+	}
+	
 	public static void main(String[] args) {
 		SpringApplication.run(KalpriceApplication.class, args);
 		
