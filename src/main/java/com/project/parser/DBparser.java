@@ -229,14 +229,46 @@ public class DBparser {
 	                	else if(colAddr.equals("T")) priceGwangju = cellContent;
 	                	else if(colAddr.equals("X")) priceDaejeon = cellContent;
 	                	else if(colAddr.equals("D")) {
-	                		// 단위 처리
-	                	}
-	                	
+	                		// 단위 처리	
+	                		if(cellContent.equals("10g")) unit = 3;
+	                		else if(cellContent.equals("50g")) unit = 4;
+	                		else if(cellContent.equals("100g")) unit = 5;
+	                		else if(cellContent.equals("200g")) unit = 6;
+	                		else if(cellContent.equals("300g")) unit = 7;
+	                		else if(cellContent.equals("400g")) unit = 8;
+	                		else if(cellContent.equals("500g")) unit = 9;
+	                		else if(cellContent.equals("1kg")) unit = 10;
+	                		else if(cellContent.equals("360㎖")) unit = 11;
+	                		else if(cellContent.equals("500㎖")) unit = 12;
+	                		else if(cellContent.equals("950㎖")) unit = 13;
+	                		else if(cellContent.equals("1ℓ")) unit = 14;
+	                		else if(cellContent.equals("1.8ℓ")) unit = 14;
+	                		else {
+	                			// 단위가 정확한 용량으로 기재되어있지 않은 경우 규격항목 참조
+	                			String[] words = standard.split(" ");
+	                			for(int i=0; i<words.length; i++) {
+	                				if(words[i].equals("10g")) unit = 3;
+	    	                		else if(words[i].equals("50g")) unit = 4;
+	    	                		else if(words[i].equals("100g")) unit = 5;
+	    	                		else if(words[i].equals("200g")) unit = 6;
+	    	                		else if(words[i].equals("300g")) unit = 7;
+	    	                		else if(words[i].equals("400g")) unit = 8;
+	    	                		else if(words[i].equals("500g")) unit = 9;
+	    	                		else if(words[i].equals("1kg")) unit = 10;
+	    	                		else if(words[i].equals("360㎖")) unit = 11;
+	    	                		else if(words[i].equals("500㎖")) unit = 12;
+	    	                		else if(words[i].equals("950㎖")) unit = 13;
+	    	                		else if(words[i].equals("1ℓ")) unit = 14;
+	    	                		else if(words[i].equals("1.8ℓ")) unit = 14;
+	                			}
+	                		}
+	                	}	
 	                }
 	                
 	                // 결과출력
 	                System.out.println("분류/" + itemClass 
 	                		+ "  품목/" + name
+	                		+ "  단위/" + unit 
 	                		+ "  규격/" + standard
 	                		+ "  등락/" + fluc
 	                		+ "  서울/" + priceSeoul
