@@ -122,31 +122,38 @@ public class DBparser {
 								}
 								*/
 								
+								// 무게단위의를 가진 항목의 경우 100그램 기준으로 가격계산
 								double devider = 1;
 								if(unit.contains("k")) devider = Double.parseDouble(unit.substring(0, unit.indexOf("k"))) * 10;
 								else if(unit.contains("g")) devider = Double.parseDouble(unit.substring(0, unit.indexOf("g"))) / 100;
-								//System.out.println(devider);
-								
+
 								priceAvg = Double.parseDouble(prices[1].replaceAll(",", "")) / devider;
+								priceAvg = Math.round(priceAvg * 100.0) / 100.0; 
 								fluc = Double.parseDouble(prices[2].replaceAll(",", ""));
+								fluc = Math.round(fluc * 100.0) / 100.0;
 								priceSeoul = Double.parseDouble(prices[4].replaceAll(",", "")) / devider;
+								priceSeoul = Math.round(priceSeoul * 100.0) / 100.0;
 								priceBusan = Double.parseDouble(prices[7].replaceAll(",", "")) / devider;
+								priceBusan = Math.round(priceBusan * 100.0) / 100.0;
 								priceDaegu = Double.parseDouble(prices[10].replaceAll(",", "")) / devider;
+								priceDaegu = Math.round(priceDaegu * 100.0) / 100.0;
 								priceGwangju = Double.parseDouble(prices[13].replaceAll(",", "")) / devider;
+								priceGwangju = Math.round(priceGwangju * 100.0) / 100.0;
 								priceDaejeon = Double.parseDouble(prices[16].replaceAll(",", "")) / devider;
+								priceDaejeon = Math.round(priceDaejeon * 100.0) / 100.0;
 								
 								// 처리결과 출력
 								System.out.println(
 										"분류:" + itemClass 
 										+ " 품목:" + name 
 										+ " 단위:" + unit
-										+ " 평균가격:" + priceAvg 
+										+ " 평균가격(100g):" + priceAvg 
 										+ " 변동:" + fluc 
-										+ " 서울:" + priceSeoul
-										+ " 부산:" + priceBusan 
-										+ " 대구: " + priceDaegu
-										+ " 광주:" + priceGwangju 
-										+ "대전: " + priceDaejeon
+										+ " 서울(100g):" + priceSeoul
+										+ " 부산(100g):" + priceBusan 
+										+ " 대구(100g): " + priceDaegu
+										+ " 광주(100g):" + priceGwangju 
+										+ "대전(100g): " + priceDaejeon
 										);
 							}
 						}
