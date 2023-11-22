@@ -1,4 +1,4 @@
-package com.project.parser;
+package com.project.mappers;
 
 public interface ParserMapperInter {
 	// 

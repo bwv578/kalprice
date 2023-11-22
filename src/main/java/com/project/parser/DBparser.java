@@ -3,6 +3,7 @@ package com.project.parser;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -128,10 +129,16 @@ public class DBparser {
 								
 								// 처리결과 출력
 								System.out.println(
-										"분류:" + itemClass + " 품목:" + name + " 단위:" + unit
-										+ " 평균가격:" + priceAvg + " 변동:" + fluc + " 서울:" + priceSeoul
-										+ " 부산:" + priceBusan + " 대구: " + priceDaegu
-										+ " 광주:" + priceGwangju + "대전: " + priceDaejeon
+										"분류:" + itemClass 
+										+ " 품목:" + name 
+										+ " 단위:" + unit
+										+ " 평균가격:" + priceAvg 
+										+ " 변동:" + fluc 
+										+ " 서울:" + priceSeoul
+										+ " 부산:" + priceBusan 
+										+ " 대구: " + priceDaegu
+										+ " 광주:" + priceGwangju 
+										+ "대전: " + priceDaejeon
 										);
 							}
 						}
@@ -144,6 +151,9 @@ public class DBparser {
 				FileInputStream fis = new FileInputStream(fileSource);
 				Workbook workbook = null;
 				
+				// 출력결과 테스트
+                StringBuilder result = new StringBuilder();
+				
 				// 엑셀 확장자에 따른 워크북 객체 생성
 				if(fileSource.endsWith(".xls")) {
 					// xls
@@ -154,47 +164,91 @@ public class DBparser {
 				}
 				
 				Sheet sheet = workbook.getSheetAt(1);
-				StringBuilder result = new StringBuilder();
-				FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
-				
+				FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();		
 				Iterator<Row> rowIterator = sheet.iterator();
 
-	            // 첫 번째 행은 헤더로 처리하고 건너뜀
-	            if (rowIterator.hasNext()) {
-	                rowIterator.next();
-	            }
-	            
+				String itemClass = null; // 품목의 분류
+				
+	            // 첫 세줄 건너뜀
+				rowIterator.next();
+				rowIterator.next();
+				rowIterator.next();
+  
 	            while (rowIterator.hasNext()) {
 	                Row row = rowIterator.next();
 	                Iterator<Cell> cellIterator = row.cellIterator();
-	                
+	                String cellContent;
+
+	                String name = null; // 품목의 이름
+	                String standard = null; // 규격
+					int unit = 0; // 품목의 기준 단위(DB상 단위코드)	
+					String priceAvg = null; // 전국 평균가격
+					String fluc = null; // 전국 평균가격의 전주대비 등락
+					String priceSeoul = null; // 서울가격
+					String priceBusan = null; // 부산가격
+					String priceDaegu = null; // 대구가격
+					String priceGwangju = null; // 광주가격
+					String priceDaejeon = null; // 대전가격
+
 	                while(cellIterator.hasNext()) {
 	                	// 셀 객체 특정 및 타입 파악
 	                	Cell cell = cellIterator.next();
 	                	CellType type = cell.getCellType();
-	                	//System.out.println(type);
+	                	String cellAddr = cell.getAddress().toString();
+	                	String colAddr = cellAddr.substring(0, 1);
 	                	
+	                	// 규격에서 벗어난 셀 건너뛰기
+	                	if(cellAddr.length() > 3) continue;
+
 	                	// 셀 타입에 따른 처리
 	                	if(type.toString().equals("FORMULA")) {
 	                		// 셀 타입이 수식인 경우
-	                		result.append(evaluator.evaluate(cell).getNumberValue() + " ");
+	                		cellContent = String.valueOf(evaluator.evaluate(cell).getNumberValue());
 	                	}else if(type.toString().equals("NUMERIC")) {
 	                		// 셀 타입이 숫자인 경우
-	                		result.append(cell.getNumericCellValue() + " ");
-	                	}else {
+	                		cellContent = String.valueOf(cell.getNumericCellValue());
+	                	}else if(type.toString().equals("STRING")){
 	                		// 셀 타입이 문자열인 경우
-	                		result.append(cell.getStringCellValue() + " ");
+	                		cellContent = cell.getStringCellValue();
+	                	}else{
+	                		// 셀이 비어있거나 기타 타입인 경우
+	                		continue;
 	                	}
+
+	                	// 셀단위 어드레스 출력 테스트
+	                	//System.out.println(type.toString() + "  " 
+	                	//+ cellContent + "  " + cellAddr + "  " + itemClass);
+	                	
+	                	if(colAddr.equals("A")) itemClass = cellContent;
+	                	else if(colAddr.equals("B")) name = cellContent;
+	                	else if(colAddr.equals("C")) standard = cellContent;
+	                	else if(colAddr.equals("G")) priceSeoul = cellContent;
+	                	else if(colAddr.equals("I")) fluc = cellContent;
+	                	else if(colAddr.equals("L")) priceBusan = cellContent;
+	                	else if(colAddr.equals("P")) priceDaegu = cellContent;
+	                	else if(colAddr.equals("T")) priceGwangju = cellContent;
+	                	else if(colAddr.equals("X")) priceDaejeon = cellContent;
+	                	else if(colAddr.equals("D")) {
+	                		// 단위 처리
+	                	}
+	                	
 	                }
 	                
-	                result.append("\n");
+	                // 결과출력
+	                System.out.println("분류/" + itemClass 
+	                		+ "  품목/" + name
+	                		+ "  규격/" + standard
+	                		+ "  등락/" + fluc
+	                		+ "  서울/" + priceSeoul
+	                		+ "  부산/" + priceBusan
+	                		+ "  대구/" + priceDaegu
+	                		+ "  광주/" + priceGwangju
+	                		+ "  대전/" + priceDaejeon
+	                		);	                
 	            }
-				
-	            // 결과 출력
-	            System.out.println(result);
+
 				workbook.close();
 			}
-			
 		}catch (IOException e) {
 			System.out.println("DB파싱 오류 : " + e.getMessage());
 		}	
