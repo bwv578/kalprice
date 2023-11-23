@@ -17,8 +17,16 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import com.project.models.Food;
+
+@Component
 public class DBparser {
+	
+	@Autowired
+	private DBparserDAO dao;
 	
 	public void parse(String fileSource) {
 		
@@ -66,13 +74,15 @@ public class DBparser {
 									words[k].contains("ℓ");
 							
 							if(isUnit) unit = words[k];
+							
 							if(unit.equals("kg")) unit = "1kg";
 							else if(unit.equals("7-8kg")) unit = "7kg";
 							else if(unit.contains("×")) unit = unit.substring(0, unit.indexOf("×"));
 							else if(unit.startsWith("(")) unit = unit.replaceAll("\\(", "");
 							else if(unit.endsWith(")")) unit = unit.substring(0, unit.indexOf("g") + 1);
+							
 							if(unit.startsWith("살코기참치")) unit = unit.replaceAll("살코기참치", "");
-							if(unit.startsWith("치약")) unit = unit.replaceAll("치약", "");
+							else if(unit.startsWith("치약")) unit = unit.replaceAll("치약", "");
 						}
 						
 						// 특정 품목의 유효한 물가정보를 담고있는 행인지 판별
@@ -111,21 +121,16 @@ public class DBparser {
 								itemClass = infos.split(" ")[0];
 								if(itemClass.equals("세제류") || itemClass.equals("위생용품") || itemClass.equals("연료류") || itemClass.equals("귀금속류")) continue;
 								name = infos.split(" ")[1];
-								
-								// 디버깅용
-								/*
-								System.out.println("sep: " + separator + " lineNum: " + (j+1) + " prices: " + prices.length);
-								System.out.println(lines[j]);
-								System.out.println(lines[j].split(separator)[lines[j].split(separator).length - 1]);
-								for(int k=0; k<prices.length; k++) {
-									System.out.println(prices[k]);
-								}
-								*/
-								
+
 								// 무게단위의를 가진 항목의 경우 100그램 기준으로 가격계산
 								double devider = 1;
-								if(unit.contains("k")) devider = Double.parseDouble(unit.substring(0, unit.indexOf("k"))) * 10;
-								else if(unit.contains("g")) devider = Double.parseDouble(unit.substring(0, unit.indexOf("g"))) / 100;
+								if(unit.contains("k")) {
+									devider = Double.parseDouble(unit.substring(0, unit.indexOf("k"))) * 10;
+									unit = "100g";
+								}else if(unit.contains("g")) {
+									devider = Double.parseDouble(unit.substring(0, unit.indexOf("g"))) / 100;
+									unit = "100g";
+								}
 
 								priceAvg = Double.parseDouble(prices[1].replaceAll(",", "")) / devider;
 								priceAvg = Math.round(priceAvg * 100.0) / 100.0; 
@@ -142,18 +147,34 @@ public class DBparser {
 								priceDaejeon = Double.parseDouble(prices[16].replaceAll(",", "")) / devider;
 								priceDaejeon = Math.round(priceDaejeon * 100.0) / 100.0;
 								
+								// DB통신
+								Food food = new Food(name, itemClass, unit);
+								food.setFluc(fluc);
+								food.setPriceAvg(priceAvg);
+								food.setPriceSeoul(priceSeoul);
+								food.setPriceBusan(priceBusan);
+								food.setPriceDaegu(priceDaegu);
+								food.setPriceGwangju(priceGwangju);
+								food.setPriceDaejeon(priceDaejeon);
+								
+								int existence = dao.doesFoodExist(food);
+								int dbAdded = 0;
+								if(existence == 0) dbAdded = dao.addFood(food);
+								
 								// 처리결과 출력
 								System.out.println(
-										"분류:" + itemClass 
-										+ " 품목:" + name 
-										+ " 단위:" + unit
-										+ " 평균가격(100g):" + priceAvg 
-										+ " 변동:" + fluc 
-										+ " 서울(100g):" + priceSeoul
-										+ " 부산(100g):" + priceBusan 
-										+ " 대구(100g): " + priceDaegu
-										+ " 광주(100g):" + priceGwangju 
-										+ "대전(100g): " + priceDaejeon
+										"분류|" + itemClass 
+										+ "  품목|" + name 
+										+ "  단위|" + unit
+										+ "  평균가격|" + priceAvg 
+										+ "  변동|" + fluc 
+										+ "  서울|" + priceSeoul
+										+ "  부산|" + priceBusan 
+										+ "  대구|" + priceDaegu
+										+ "  광주|" + priceGwangju 
+										+ "  대전|" + priceDaejeon
+										+ "  존재여부|" + existence
+										+ "  DB에 추가|" + dbAdded
 										);
 							}
 						}
