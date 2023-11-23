@@ -7,22 +7,22 @@ import lombok.Setter;
 @Setter
 public class Food {
 
-	private String id; // DB상 음식ID
-	private String name;
-	private String itemClass;
-	private String unit;
-	private Object priceAvg;
-	private Object fluc;
-	private Object priceSeoul;
-	private Object priceBusan;
-	private Object priceDaegu;
-	private Object priceGwangju;
-	private Object priceDaejeon;
+	private String foodId = null;
+	private String foodName = null;
+    private String foodUnit = null;
+    private String foodClass = null;
+    private Object seoulPrice = null;
+    private Object busanPrice = null;
+    private Object daeguPrice = null;
+    private Object daejeonPrice = null;
+    private Object gwangjuPrice = null;
+    private Object avg = 0;
+    private Object fluc = null;
 	
 	public Food(String name, String itemClass, String unit) {
-		this.name = name;
-		this.itemClass = itemClass;
-		this.unit = unit;
+		this.foodName = name;
+		this.foodClass = itemClass;
+		this.foodUnit = unit;
 	}
 	
 }

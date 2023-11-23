@@ -30,7 +30,6 @@ public class DBparserDAO {
 	// DB에 새로운 음식정보 추가
 	public int addFood(Food food) {
 		int result = mapper.addFood(food);
-		
 		return result;
 	}
 	
