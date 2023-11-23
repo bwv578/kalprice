@@ -19,10 +19,15 @@ public interface ParserMapperInter {
 	@Insert("insert into food values(0, #{name}, #{itemClass}, #{unit})")
 	public abstract int addFood(Food food);
 	
+	// 특정 항목과 동일한 분류 및 이름, 날짜를 가진 항목의 물가정보가 존재하는지 확인
+	@Select("select count(*) from price where id=#{id} and date=#{date}")
+	public abstract int doesPriceExist(String id, String date);
+	
 	// 물가정보 추가
 	@Insert("insert into price values("
 			+ "now(), #{id}, #{fluc}, #{priceSeoul}, "
-			+ "#{priceBusan}, #{priceDaegu}, #{priceGwangju}, #{priceDaejeon})")
+			+ "#{priceBusan}, #{priceDaegu}, #{priceGwangju}, "
+			+ "#{priceDaejeon}, #{priceAvg})")
 	public abstract int addPrice(Food food);
 
 }

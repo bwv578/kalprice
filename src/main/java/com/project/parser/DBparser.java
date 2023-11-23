@@ -28,7 +28,7 @@ public class DBparser {
 	@Autowired
 	private DBparserDAO dao;
 	
-	public void parse(String fileSource) {
+	public void parse(String fileSource, String date) {
 		
 		try {
 			File source = new File(fileSource);
@@ -55,13 +55,13 @@ public class DBparser {
 						String name; // 품목의 이름
 						String unit = ""; // 품목의 기준 단위
 						String itemClass; // 품목의 분류
-						double priceAvg; // 전국 평균가격
-						double fluc; // 전국 평균가격의 전주대비 등락
-						double priceSeoul; // 서울가격
-						double priceBusan; // 부산가격
-						double priceDaegu; // 대구가격
-						double priceGwangju; // 광주가격
-						double priceDaejeon; // 대전가격
+						Object priceAvg; // 전국 평균가격
+						Object fluc; // 전국 평균가격의 전주대비 등락
+						Object priceSeoul; // 서울가격
+						Object priceBusan; // 부산가격
+						Object priceDaegu; // 대구가격
+						Object priceGwangju; // 광주가격
+						Object priceDaejeon; // 대전가격
 						String separator = ""; // 행 데이터에서 품목 구성요소 영역과 가격영역 구분자
 						
 						// 행 데이터를 단어 단위로 분할, 단위정보 추출
@@ -114,7 +114,7 @@ public class DBparser {
 							if(separator != "") {
 								// 구분자를 통해 행을 기본정보와 가격정보 영역으로 분할
 								String infos = lines[j].split(separator)[0];
-								if(lines[j].split(separator)[lines[j].split(separator).length - 1].contains(" - ")) continue;
+								lines[j] = lines[j].replaceAll("- ", "null ");
 								String[] prices = lines[j].split(separator)[lines[j].split(separator).length - 1].split(" ");
 								
 								// 기본정보로부터 분류, 이름 특정 
@@ -131,22 +131,43 @@ public class DBparser {
 									devider = Double.parseDouble(unit.substring(0, unit.indexOf("g"))) / 100;
 									unit = "100g";
 								}
-
-								priceAvg = Double.parseDouble(prices[1].replaceAll(",", "")) / devider;
-								priceAvg = Math.round(priceAvg * 100.0) / 100.0; 
-								fluc = Double.parseDouble(prices[2].replaceAll(",", ""));
-								fluc = Math.round(fluc * 100.0) / 100.0;
-								priceSeoul = Double.parseDouble(prices[4].replaceAll(",", "")) / devider;
-								priceSeoul = Math.round(priceSeoul * 100.0) / 100.0;
-								priceBusan = Double.parseDouble(prices[7].replaceAll(",", "")) / devider;
-								priceBusan = Math.round(priceBusan * 100.0) / 100.0;
-								priceDaegu = Double.parseDouble(prices[10].replaceAll(",", "")) / devider;
-								priceDaegu = Math.round(priceDaegu * 100.0) / 100.0;
-								priceGwangju = Double.parseDouble(prices[13].replaceAll(",", "")) / devider;
-								priceGwangju = Math.round(priceGwangju * 100.0) / 100.0;
-								priceDaejeon = Double.parseDouble(prices[16].replaceAll(",", "")) / devider;
-								priceDaejeon = Math.round(priceDaejeon * 100.0) / 100.0;
 								
+								if(prices[1].equals("null")) priceAvg = null;								
+								else{
+									priceAvg = Double.parseDouble(prices[1].replaceAll(",", "")) / devider;
+									priceAvg = Math.round((Double)priceAvg * 100.0) / 100.0;
+								}
+								if(prices[2].equals("null")) fluc = null; 
+								else {
+									fluc = Double.parseDouble(prices[2].replaceAll(",", ""));
+									fluc = Math.round((Double)fluc * 100.0) / 100.0;
+								}
+								if(prices[4].equals("null")) priceSeoul = null;
+								else {
+									priceSeoul = Double.parseDouble(prices[4].replaceAll(",", "")) / devider;
+									priceSeoul = Math.round((Double)priceSeoul * 100.0) / 100.0;
+								}
+								if(prices[7].equals("null")) priceBusan = null;
+								else {
+									priceBusan = Double.parseDouble(prices[7].replaceAll(",", "")) / devider;
+									priceBusan = Math.round((Double)priceBusan * 100.0) / 100.0;
+								}
+								if(prices[10].equals("null")) priceDaegu = null;
+								else {
+									priceDaegu = Double.parseDouble(prices[10].replaceAll(",", "")) / devider;
+									priceDaegu = Math.round((Double)priceDaegu * 100.0) / 100.0;
+								}
+								if(prices[13].equals("null")) priceGwangju = null;
+								else {
+									priceGwangju = Double.parseDouble(prices[13].replaceAll(",", "")) / devider;
+									priceGwangju = Math.round((Double)priceGwangju * 100.0) / 100.0;
+								}
+								if(prices[16].equals("null")) priceDaejeon = null;
+								else {
+									priceDaejeon = Double.parseDouble(prices[16].replaceAll(",", "")) / devider;
+									priceDaejeon = Math.round((Double)priceDaejeon * 100.0) / 100.0;
+								}
+
 								// DB통신
 								Food food = new Food(name, itemClass, unit);
 								food.setFluc(fluc);
@@ -157,11 +178,18 @@ public class DBparser {
 								food.setPriceGwangju(priceGwangju);
 								food.setPriceDaejeon(priceDaejeon);
 								
-								int existence = dao.doesFoodExist(food);
-								int dbAdded = 0;
-								if(existence == 0) dbAdded = dao.addFood(food);
+								int foodExistence = dao.doesFoodExist(food);
+								int foodAdded = 0;
+								int priceAdded = 0;
 								
-								// 처리결과 출력
+								if(foodExistence == 0) foodAdded = dao.addFood(food);
+								String id = dao.searchFoodId(food);
+								food.setId(id);
+								
+								int priceExistence = dao.doesPriceExist(id, date);
+								if(priceExistence == 0) priceAdded = dao.addPrice(food);
+								
+								// 처리결과 출력		
 								System.out.println(
 										"분류|" + itemClass 
 										+ "  품목|" + name 
@@ -173,9 +201,11 @@ public class DBparser {
 										+ "  대구|" + priceDaegu
 										+ "  광주|" + priceGwangju 
 										+ "  대전|" + priceDaejeon
-										+ "  존재여부|" + existence
-										+ "  DB에 추가|" + dbAdded
-										);
+										+ "  음식존재|" + foodExistence
+										+ "  음식추가|" + foodAdded
+										+ "  가격존재" + priceExistence
+										+ "  가격추가|" + priceAdded
+										);										
 							}
 						}
 					}
@@ -214,7 +244,7 @@ public class DBparser {
 
 	                String name = null; // 품목의 이름
 	                String standard = null; // 규격
-					int unit = 0; // 품목의 기준 단위(DB상 단위코드)	
+					int unit = 0; // 품목의 기준 단위(DB상 단위코드)
 					String priceAvg = null; // 전국 평균가격
 					String fluc = null; // 전국 평균가격의 전주대비 등락
 					String priceSeoul = null; // 서울가격

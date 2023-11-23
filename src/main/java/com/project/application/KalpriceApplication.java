@@ -24,14 +24,13 @@ public class KalpriceApplication extends SpringBootServletInitializer{
 		//SpringApplication.run(KalpriceApplication.class, args);
 		
 		ConfigurableApplicationContext context = SpringApplication.run(KalpriceApplication.class, args);
-		
 		DBparser parser = context.getBean(DBparser.class);
 
 		String fileSource = "C:\\Java\\smh-workspace\\kalprice\\src\\main\\resources\\static\\20231115 주간생활물가 동향 및 시세표.pdf";
 		//String fileSource = "C:\\Java\\smh-workspace\\kalprice\\src\\main\\resources\\static\\230607 생활물가 시세표 및 동향.xls";
 		//String fileSource = "C:\\Java\\smh-workspace\\kalprice\\src\\main\\resources\\static\\20231108 주간생활물가 동향 및 시세표.pdf";
 		
-		parser.parse(fileSource);
+		parser.parse(fileSource, "2023-11-23");
 	}
 
 }

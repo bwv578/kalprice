@@ -21,14 +21,28 @@ public class DBparserDAO {
 		return result;
 	}
 	
+	// DB에서 특정 음식의 id 검색
+	public String searchFoodId(Food food) {
+		String id = mapper.searchFoodId(food);
+		return id;
+	}
+	
 	// DB에 새로운 음식정보 추가
 	public int addFood(Food food) {
-		int addFood = mapper.addFood(food);
-		//int addPrice = mapper.addPrice(food);
+		int result = mapper.addFood(food);
 		
-		int result = 0;
-		if(addFood == 1) result = 1;
-		
+		return result;
+	}
+	
+	// 해당 항목과 동일한 분류 및 이름, 날짜를 가진 항목의 물가정보가 존재하는지 확인
+	public int doesPriceExist(String id, String date) {
+		int result = mapper.doesPriceExist(id, date);
+		return result;
+	}
+	
+	// DB에 새로운 음식 물가정보 추가
+	public int addPrice(Food food) {
+		int result = mapper.addPrice(food);
 		return result;
 	}
 	

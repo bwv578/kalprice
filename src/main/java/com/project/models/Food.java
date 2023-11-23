@@ -11,13 +11,13 @@ public class Food {
 	private String name;
 	private String itemClass;
 	private String unit;
-	private double priceAvg;
-	private double fluc;
-	private double priceSeoul;
-	private double priceBusan;
-	private double priceDaegu;
-	private double priceGwangju;
-	private double priceDaejeon;
+	private Object priceAvg;
+	private Object fluc;
+	private Object priceSeoul;
+	private Object priceBusan;
+	private Object priceDaegu;
+	private Object priceGwangju;
+	private Object priceDaejeon;
 	
 	public Food(String name, String itemClass, String unit) {
 		this.name = name;
