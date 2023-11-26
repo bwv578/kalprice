@@ -37,7 +37,7 @@ public class KalpriceApplication extends SpringBootServletInitializer{
 		
 		// 영양정보 api 테스트
 		NutritionCollector nc = context.getBean(NutritionCollector.class);
-		nc.getInfo();
+		nc.getInfo("소주", "과채류", 1);
 	}
 
 }

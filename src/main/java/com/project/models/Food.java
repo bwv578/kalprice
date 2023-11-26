@@ -11,6 +11,7 @@ public class Food {
 	private String foodName = null;
     private String foodUnit = null;
     private String foodClass = null;
+    
     private Object seoulPrice = null;
     private Object busanPrice = null;
     private Object daeguPrice = null;
@@ -18,10 +19,15 @@ public class Food {
     private Object gwangjuPrice = null;
     private Object avg = 0;
     private Object fluc = null;
-	
-	public Food(String name, String itemClass, String unit) {
+    
+    private Object calorie;
+    private Object carbohydrate;
+    private Object protein;
+    private Object fat;
+    
+	public Food(String name, String foodClass, String unit) {
 		this.foodName = name;
-		this.foodClass = itemClass;
+		this.foodClass = foodClass;
 		this.foodUnit = unit;
 	}
 	

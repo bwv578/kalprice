@@ -182,8 +182,10 @@ public class DBparser {
 								int foodAdded = 0;
 								int priceAdded = 0;
 								
+								// 새로운 항목인 경우
 								if(foodExistence == 0) foodAdded = dao.addFood(food);
 								String id = dao.searchFoodId(food);
+								
 
 								int priceExistence = dao.doesPriceExist(id, date);
 								food.setFoodId(id);
