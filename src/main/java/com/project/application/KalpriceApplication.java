@@ -33,11 +33,11 @@ public class KalpriceApplication extends SpringBootServletInitializer{
 		//String fileSource = "C:\\Java\\smh-workspace\\kalprice\\src\\main\\resources\\static\\20231108 주간생활물가 동향 및 시세표.pdf";
 		String fileSource = "C:\\Java\\smh-workspace\\kalprice\\src\\main\\resources\\static\\20231122 주간생활물가 동향 및 시세표.pdf";
 		
-		//parser.parse(fileSource, "2023-11-24");
+		parser.parse(fileSource, "2023-11-24");
 		
 		// 영양정보 api 테스트
-		NutritionCollector nc = context.getBean(NutritionCollector.class);
-		nc.getInfo("소주", "과채류", 1);
+		//NutritionCollector nc = context.getBean(NutritionCollector.class);
+		//nc.getInfo("백미", "곡류", 1);
 	}
 
 }

@@ -27,6 +27,8 @@ public class DBparser {
 	
 	@Autowired
 	private DBparserDAO dao;
+	@Autowired
+	private NutritionCollector nutritionCollector;
 	
 	public void parse(String fileSource, String date) {
 		
@@ -207,7 +209,19 @@ public class DBparser {
 										+ "  음식추가|" + foodAdded
 										+ "  가격존재" + priceExistence
 										+ "  가격추가|" + priceAdded
-										);										
+										);
+								
+								// 영양정보 수집
+								int count = 1;
+								HashMap<String, Object> nutrience = new HashMap<>();
+								while(true) {
+									nutrience = nutritionCollector.getInfo(name, itemClass, count);
+									if(!nutrience.get("total").equals("999") || !nutrience.get("calrorie").equals(null)) break;
+									count++;
+								}
+								
+								// 테스트
+								System.out.println("열량 - " + nutrience.get("calrorie"));
 							}
 						}
 					}

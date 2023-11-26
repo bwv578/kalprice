@@ -52,7 +52,7 @@ public class NutritionCollector {
             }
             reader.close();
             
-            System.out.println(response);
+            //System.out.println(response);
             
             // xml로 파싱
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -63,7 +63,7 @@ public class NutritionCollector {
 			NodeList rows = doc.getElementsByTagName("row");
 			// 데이터 건수
 			Element total = (Element)doc.getElementsByTagName("total_count").item(0);
-			System.out.println("total - " + total.getTextContent());
+			nutrience.put("total", total.getTextContent());
 			
 			// 각 행에 대한 처리
 			for(int i=0; i<rows.getLength(); i++) {
@@ -96,8 +96,8 @@ public class NutritionCollector {
 					nutrience.put("fat", fat);
 					nutrience.put("unit", unit);
 					
-					//System.out.println(id + " // " + desc + " // " + group + " // " + size + " // " + unit);
-					//break;
+					//System.out.println(id + " // " + desc + " // " + group + " // " + size + " // " + unit + " // " + calrorie);
+					break;
 				}
 			}
 			
