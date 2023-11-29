@@ -26,7 +26,7 @@ public interface ParserMapperInter {
 	
 	// 물가정보 추가
 	@Insert("insert into price values("
-			+ "now(), #{foodId}, #{fluc}, #{seoulPrice}, "
+			+ "#{date}, #{foodId}, #{fluc}, #{seoulPrice}, "
 			+ "#{busanPrice}, #{daeguPrice}, #{gwangjuPrice}, "
 			+ "#{daejeonPrice}, #{avg})")
 	public abstract int addPrice(Food food);

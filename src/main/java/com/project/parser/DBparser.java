@@ -127,7 +127,7 @@ public class DBparser {
 								itemClass = infos.split(" ")[0];
 								name = infos.split(" ")[1];
 								if(itemClass.equals("세제류") || itemClass.equals("위생용품") || itemClass.equals("연료류") || itemClass.equals("귀금속류")) continue;
-								
+	
 								// 영양성분 api 기준으로 분류표기 변경
 								if(itemClass.equals("과일류")) itemClass = "과실류";
 								else if(itemClass.equals("과채류") || 
@@ -151,6 +151,19 @@ public class DBparser {
 								}else if(unit.contains("g")) {
 									devider = Double.parseDouble(unit.substring(0, unit.indexOf("g"))) / 100;
 									unit = "100g";
+								}else if(itemClass.equals("조미료류∙장류∙유지류") || name.equals("생수")) {
+									if(unit.contains("㎖")) {
+										devider = Double.parseDouble(unit.substring(0, unit.indexOf("㎖"))) / 100;
+									}else {
+										devider = Double.parseDouble(unit.substring(0, unit.indexOf("ℓ"))) * 10;
+									}
+									unit = "100㎖";
+								}
+								
+								// 라면 예외처리
+								if(name.equals("라면")) {
+									devider = 1;
+									unit = "120g";
 								}
 								
 								if(prices[1].equals("-")) priceAvg = null;								
@@ -188,6 +201,26 @@ public class DBparser {
 									priceDaejeon = Double.parseDouble(prices[16].replaceAll(",", "")) / devider;
 									priceDaejeon = Math.round((Double)priceDaejeon * 100.0) / 100.0;
 								}
+								
+								// 물가정보상의 용량 계산
+								Double amount;
+								if(unit.contains("k")) amount = Double.parseDouble(unit.replaceAll("kg", ""));
+								else if(unit.contains("g")) amount = Double.parseDouble(unit.replaceAll("g", ""));
+								else if(unit.contains("㎖")) amount = Double.parseDouble(unit.replaceAll("㎖", ""));
+								else amount = Double.parseDouble(unit.replaceAll("ℓ", ""));
+								
+								// DB기준으로 unit 코드 수정
+								if(unit.equals("100g")) unit = "1";
+								else if(unit.equals("120g")) unit = "2";
+								else if(unit.equals("100㎖")) unit = "3";
+								else if(unit.equals("320㎖")) unit = "4";
+								else if(unit.equals("360㎖")) unit = "5";
+								else if(unit.equals("500㎖")) unit = "6";
+								else if(unit.equals("860㎖")) unit = "7";
+								else if(unit.equals("900㎖")) unit = "8";
+								else if(unit.equals("950㎖")) unit = "9";
+								else if(unit.equals("1000㎖")) unit = "10";
+								else if(unit.equals("1.8ℓ")) unit = "11";
 
 								// DB통신
 								Food food = new Food(name, itemClass, unit);
@@ -198,6 +231,7 @@ public class DBparser {
 								food.setDaeguPrice(priceDaegu); 
 								food.setGwangjuPrice(priceGwangju);
 								food.setDaejeonPrice(priceDaejeon);
+								food.setDate(date);
 								
 								int foodExistence = dao.doesFoodExist(food);
 								int foodAdded = 0;
@@ -241,14 +275,7 @@ public class DBparser {
 								// 새로운 항목인 경우 영양정보 새로 추가
 								if(foodExistence == 0) {
 									if(unit.equals(null)) continue;
-									
-									// 물가정보상의 용량당 영양성분 함량 계산
-									Double amount;
-									if(unit.contains("k")) amount = Double.parseDouble(unit.replaceAll("kg", ""));
-									else if(unit.contains("g")) amount = Double.parseDouble(unit.replaceAll("g", ""));
-									else if(unit.contains("㎖")) amount = Double.parseDouble(unit.replaceAll("㎖", ""));
-									else amount = Double.parseDouble(unit.replaceAll("ℓ", ""));
-									
+
 									Object calorie = (Double)nutrition.get("calorie");
 									Object carbohydrate = (Double)nutrition.get("carbohydrate");
 									Object protein = (Double)nutrition.get("protein");

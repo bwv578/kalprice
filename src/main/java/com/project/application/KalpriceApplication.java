@@ -43,5 +43,5 @@ public class KalpriceApplication extends SpringBootServletInitializer{
 		Nut nut = context.getBean(Nut.class);
 		nut.insertDB();
 	}
-
+	
 }

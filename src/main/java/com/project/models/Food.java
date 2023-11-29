@@ -25,6 +25,8 @@ public class Food {
     private Object protein;
     private Object fat;
     
+    private String date;
+    
 	public Food(String name, String foodClass, String unit) {
 		this.foodName = name;
 		this.foodClass = foodClass;
