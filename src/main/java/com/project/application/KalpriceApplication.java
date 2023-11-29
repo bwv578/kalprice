@@ -9,6 +9,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 import com.project.parser.DBparser;
+import com.project.parser.Nut;
 import com.project.parser.NutritionCollector;
 
 @SpringBootApplication
@@ -26,18 +27,21 @@ public class KalpriceApplication extends SpringBootServletInitializer{
 		
 		ConfigurableApplicationContext context = SpringApplication.run(KalpriceApplication.class, args);
 		DBparser parser = context.getBean(DBparser.class);
-		
 
 		//String fileSource = "C:\\Java\\smh-workspace\\kalprice\\src\\main\\resources\\static\\20231115 주간생활물가 동향 및 시세표.pdf";
 		//String fileSource = "C:\\Java\\smh-workspace\\kalprice\\src\\main\\resources\\static\\230607 생활물가 시세표 및 동향.xls";
 		//String fileSource = "C:\\Java\\smh-workspace\\kalprice\\src\\main\\resources\\static\\20231108 주간생활물가 동향 및 시세표.pdf";
 		String fileSource = "C:\\Java\\smh-workspace\\kalprice\\src\\main\\resources\\static\\20231122 주간생활물가 동향 및 시세표.pdf";
 		
-		parser.parse(fileSource, "2023-11-24");
+		//parser.parse(fileSource, "2023-11-22");
 		
 		// 영양정보 api 테스트
 		//NutritionCollector nc = context.getBean(NutritionCollector.class);
-		//nc.getInfo("백미", "곡류", 1);
+		//nc.getInfo("감귤", "과실류", 1);
+		
+		// DB에 누락된 정보 수동삽입
+		Nut nut = context.getBean(Nut.class);
+		nut.insertDB();
 	}
 
 }

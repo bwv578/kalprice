@@ -45,4 +45,15 @@ public class DBparserDAO {
 		return result;
 	}
 	
+	// DB에 새로운 음식 영양정보 추가
+	public int addNutrition(Food food) {
+		int result = mapper.addNutrition(food);
+		return result;
+	}
+	
+	// DB에 누락된 음식 영양정보 수동으로 추가
+	public int addNutritionManual(Food food) {
+		int result = mapper.addNutritionManual(food);
+		return result;
+	}
 }

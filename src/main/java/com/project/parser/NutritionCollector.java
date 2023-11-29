@@ -79,24 +79,24 @@ public class NutritionCollector {
 					// xml로부터 데이터 추출
 					double size = Double.parseDouble(row.getElementsByTagName("SERVING_SIZE").item(0).getTextContent()); 
 					String unit = row.getElementsByTagName("SERVING_UNIT").item(0).getTextContent();
-					double calrorie = Double.parseDouble(row.getElementsByTagName("NUTR_CONT1").item(0).getTextContent());
+					double calorie = Double.parseDouble(row.getElementsByTagName("NUTR_CONT1").item(0).getTextContent());
 					double carbohydrate = Double.parseDouble(row.getElementsByTagName("NUTR_CONT2").item(0).getTextContent());
 					double protein = Double.parseDouble(row.getElementsByTagName("NUTR_CONT3").item(0).getTextContent());
 					double fat = Double.parseDouble(row.getElementsByTagName("NUTR_CONT4").item(0).getTextContent());
 					
 					// 단위 1당 함량으로 변경
-					calrorie = calrorie / size;
+					calorie = calorie / size;
 					carbohydrate = carbohydrate / size;
 					protein = protein / size;
 					fat = fat / size;
 					
-					nutrience.put("calrorie", calrorie);
+					nutrience.put("calorie", calorie);
 					nutrience.put("carbohydrate", carbohydrate);
 					nutrience.put("protein", protein);
 					nutrience.put("fat", fat);
 					nutrience.put("unit", unit);
 					
-					//System.out.println(id + " // " + desc + " // " + group + " // " + size + " // " + unit + " // " + calrorie);
+					//System.out.println(id + " // " + desc + " // " + group + " // " + size + " // " + unit + " // " + calorie);
 					break;
 				}
 			}

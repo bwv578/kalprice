@@ -2,6 +2,7 @@ package com.project.mappers;
 
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import com.project.models.Food;
 
@@ -25,9 +26,17 @@ public interface ParserMapperInter {
 	
 	// 물가정보 추가
 	@Insert("insert into price values("
-			+ "date_add(now(), interval +1 day), #{foodId}, #{fluc}, #{seoulPrice}, "
+			+ "now(), #{foodId}, #{fluc}, #{seoulPrice}, "
 			+ "#{busanPrice}, #{daeguPrice}, #{gwangjuPrice}, "
 			+ "#{daejeonPrice}, #{avg})")
 	public abstract int addPrice(Food food);
 
+	// 영양정보 추가
+	@Insert("insert into nutrient values(#{foodId}, #{calorie}, #{carbohydrate}, #{protein}, #{fat})")
+	public abstract int addNutrition(Food food);
+	
+	// 누락된 영양정보 수동 추가
+	@Update("update nutrient set kcal=#{calorie}, carbohydrate=#{carbohydrate}, "
+			+ "protein=#{protein}, fat=#{fat} where id=#{foodId}")
+	public abstract int addNutritionManual(Food food);
 }

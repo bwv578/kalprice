@@ -47,7 +47,7 @@ public class DBparser {
 				
 				// 2페이지부터 처리 (1페이지는 개황 및 전망자료)
 				for(int i=1; i<totalPages; i++) {
-					System.out.println("@@@@@@@ " + i + " 페이지@@@@@@@" );
+					System.out.println("@@@@@@@ " + i + "페이지 @@@@@@@");
 					
 					// 페이지 내용을 행단위로 분할
 					String[] lines = sheets[i].split("\n");
@@ -71,11 +71,15 @@ public class DBparser {
 						for(int k=0; k<words.length; k++) {
 							boolean isUnit = 
 									words[k].contains("g") ||
+									words[k].contains("G") ||
 									words[k].contains("kg") ||
 									words[k].contains("㎖") ||
 									words[k].contains("ℓ");
 							
 							if(isUnit) unit = words[k];
+							
+							if(unit.contains("G")) unit = unit.replaceAll("G", "g");
+							if(unit.contains("K")) unit = unit.replaceAll("K", "k");
 							
 							if(unit.equals("kg")) unit = "1kg";
 							else if(unit.equals("7-8kg")) unit = "7kg";
@@ -121,9 +125,24 @@ public class DBparser {
 								
 								// 기본정보로부터 분류, 이름 특정 
 								itemClass = infos.split(" ")[0];
-								if(itemClass.equals("세제류") || itemClass.equals("위생용품") || itemClass.equals("연료류") || itemClass.equals("귀금속류")) continue;
 								name = infos.split(" ")[1];
-
+								if(itemClass.equals("세제류") || itemClass.equals("위생용품") || itemClass.equals("연료류") || itemClass.equals("귀금속류")) continue;
+								
+								// 영양성분 api 기준으로 분류표기 변경
+								if(itemClass.equals("과일류")) itemClass = "과실류";
+								else if(itemClass.equals("과채류") || 
+										itemClass.equals("나물류") ||
+										itemClass.equals("양채류") ||
+										itemClass.equals("엽채류") ||
+										itemClass.equals("조미채류")) itemClass = "채소류";
+								else if(itemClass.equals("패류") ||
+										name.equals("멸치")) itemClass = "어패류 및 기타 수산물";
+								else if(itemClass.equals("서류")) itemClass = "감자 및 전분류";
+								else if(itemClass.equals("난류")) itemClass = "알가공품류";
+								else if(itemClass.equals("계육류")) itemClass = "육류";
+								else if(itemClass.equals("유제품")) itemClass = "유가공품";
+								else if(name.equals("미역"))	itemClass = "해조류";	
+							
 								// 무게단위의를 가진 항목의 경우 100그램 기준으로 가격계산
 								double devider = 1;
 								if(unit.contains("k")) {
@@ -187,7 +206,6 @@ public class DBparser {
 								// 새로운 항목인 경우
 								if(foodExistence == 0) foodAdded = dao.addFood(food);
 								String id = dao.searchFoodId(food);
-								
 
 								int priceExistence = dao.doesPriceExist(id, date);
 								food.setFoodId(id);
@@ -213,15 +231,44 @@ public class DBparser {
 								
 								// 영양정보 수집
 								int count = 1;
-								HashMap<String, Object> nutrience = new HashMap<>();
+								HashMap<String, Object> nutrition = new HashMap<>();
 								while(true) {
-									nutrience = nutritionCollector.getInfo(name, itemClass, count);
-									if(!nutrience.get("total").equals("999") || !nutrience.get("calrorie").equals(null)) break;
-									count++;
+									nutrition = nutritionCollector.getInfo(name, itemClass, count);
+									if(nutrition.get("total").equals("999") && nutrition.get("calorie").equals(null)) count++;
+									else break;
 								}
 								
-								// 테스트
-								System.out.println("열량 - " + nutrience.get("calrorie"));
+								// 새로운 항목인 경우 영양정보 새로 추가
+								if(foodExistence == 0) {
+									if(unit.equals(null)) continue;
+									
+									// 물가정보상의 용량당 영양성분 함량 계산
+									Double amount;
+									if(unit.contains("k")) amount = Double.parseDouble(unit.replaceAll("kg", ""));
+									else if(unit.contains("g")) amount = Double.parseDouble(unit.replaceAll("g", ""));
+									else if(unit.contains("㎖")) amount = Double.parseDouble(unit.replaceAll("㎖", ""));
+									else amount = Double.parseDouble(unit.replaceAll("ℓ", ""));
+									
+									Object calorie = (Double)nutrition.get("calorie");
+									Object carbohydrate = (Double)nutrition.get("carbohydrate");
+									Object protein = (Double)nutrition.get("protein");
+									Object fat = (Double)nutrition.get("fat");
+									
+									if(calorie != null) calorie = (Double)calorie * amount;
+									if(carbohydrate != null) carbohydrate = (Double)carbohydrate * amount;
+									if(protein != null) protein = (Double)protein * amount;
+									if(fat != null) fat = (Double)fat * amount;
+									
+									// DB통신
+									food.setCalorie(calorie);
+									food.setCarbohydrate(carbohydrate);
+									food.setProtein(protein);
+									food.setFat(fat);			
+									dao.addNutrition(food);
+									
+									// 테스트
+									System.out.println("열량 - " + nutrition.get("calorie"));
+								}
 							}
 						}
 					}
